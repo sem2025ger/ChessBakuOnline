@@ -1,0 +1,180 @@
+/* styles.css
+ *
+ * Provides a dark, modern theme for the ChessBaku Online interface.  The
+ * layout uses a flexible two‑column design with the chessboard on the
+ * left and analysis/chat panels on the right.  Buttons, panels and
+ * text are styled to evoke a professional chess platform similar to
+ * Chess.com or Lichess.
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+/* Container splits the viewport horizontally into left (game) and
+   right (analysis + chat) columns. */
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.left,
+.right {
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.right {
+  width: 350px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Chessboard container */
+#board {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Control buttons */
+.controls {
+  margin-top: 12px;
+}
+
+.btn {
+  background-color: #272727;
+  color: #fafafa;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+.btn:hover {
+  background-color: #3a3a3a;
+}
+
+/* Move history and status */
+.history {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #222;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #1a1a1a;
+}
+
+.status {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* Panels (analysis, chat) */
+.panel {
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.panel h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #ffc857;
+}
+
+/* Analysis panel */
+.analysis div {
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.pv {
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-height: 120px;
+}
+
+/* Chat */
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  font-size: 0.85rem;
+}
+.chat-messages .msg {
+  margin-bottom: 6px;
+}
+.chat-messages .msg .time {
+  font-size: 0.7rem;
+  color: #888;
+  margin-right: 4px;
+}
+.chat-messages .msg .user {
+  font-weight: bold;
+  margin-right: 4px;
+  color: #8ab4f8;
+}
+.chat-input {
+  display: flex;
+  margin-top: 8px;
+}
+.chat-input input {
+  flex: 1;
+  background-color: #272727;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #e0e0e0;
+  padding: 6px;
+  margin-right: 6px;
+}
+.chat-input input:focus {
+  outline: none;
+  border-color: #555;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .right {
+    width: 100%;
+    min-width: 0;
+    height: 50vh;
+  }
+  #board {
+    max-width: 100%;
+  }
+}
