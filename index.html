@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChessBaku Online</title>
+    <!-- Chessboard.js styles -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
+    />
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <div class="left">
+          <div id="board" class="board"></div>
+          <div id="controls" class="controls">
+            <button id="newGameBtn" class="btn">New Game</button>
+            <button id="undoBtn" class="btn">Undo</button>
+            <button id="flipBtn" class="btn">Flip Board</button>
+          </div>
+          <div id="moveHistory" class="history"></div>
+          <div id="status" class="status"></div>
+        </div>
+        <div class="right">
+          <div id="analysisPanel" class="panel analysis">
+            <h3>Real‑Time Analysis</h3>
+            <div>Evaluation: <span id="eval">0.0</span></div>
+            <div>Depth: <span id="depth">0</span></div>
+            <div>Nodes: <span id="nodes">0</span></div>
+            <div>Speed: <span id="nps">0</span></div>
+            <div>Best Move: <span id="bestMove">–</span></div>
+            <div>Principal Variation:</div>
+            <div id="pv" class="pv"></div>
+          </div>
+          <div id="chatPanel" class="panel chat">
+            <h3>Chat</h3>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input">
+              <input id="chatInput" type="text" placeholder="Enter message…" />
+              <button id="chatSendBtn" class="btn">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Socket.IO client (served from our server) -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Chess.js for game logic -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
+    <!-- Chessboard.js for the interactive board -->
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <!-- Application logic -->
+    <script src="/app.js"></script>
+  </body>
+</html>
