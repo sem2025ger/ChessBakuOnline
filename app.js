@@ -1,55 +1,109 @@
+console.log("ChessBakuOnline loaded.");
+
+const canvas = document.getElementById("boardCanvas");
+const ctx = canvas.getContext("2d");
+
+const logBox = document.getElementById("log");
+const evalFill = document.getElementById("evalFill");
+
+const depthSlider = document.getElementById("depthSlider");
+const timeSlider = document.getElementById("timeSlider");
+
 let chess = new Chess();
-let boardElement = document.getElementById("board");
-let logContainer = document.getElementById("gameLog");
+
+// Создаем Web Worker движка
+const engine = new Worker("stockfish-worker.js");
 
 function log(text) {
-    logContainer.innerHTML += text + "<br>";
+    logBox.innerHTML += text + "<br>";
+    logBox.scrollTop = logBox.scrollHeight;
 }
 
-document.getElementById("newGameBtn").onclick = () => {
-    chess.reset();
-    updateBoard();
-    log("New game started.");
+// Обработка ответов движка
+engine.onmessage = (e) => {
+    const msg = e.data;
+
+    if (msg.type === "info") {
+        if (msg.score) {
+            updateEval(msg.score);
+        }
+    }
+
+    if (msg.type === "bestmove") {
+        chess.move(msg.move);
+        drawBoard();
+        log("Engine move: " + msg.move);
+    }
 };
 
-function updateBoard() {
-    boardElement.innerHTML = "";
+function updateEval(score) {
+    let scaled = 50 + score * 4;
+    if (scaled < 0) scaled = 0;
+    if (scaled > 100) scaled = 100;
 
-    let board = chess.board();
+    evalFill.style.width = scaled + "%";
+}
+
+// Нарисовать доску (простая визуализация)
+function drawBoard() {
+    ctx.fillStyle = "#111";
+    ctx.fillRect(0, 0, 600, 600);
+
+    const board = chess.board();
+
+    const size = 75;
+
     for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
-            let sq = document.createElement("div");
-            sq.className = "sq";
-
-            let piece = board[r][c];
-            if (piece) {
-                let img = document.createElement("span");
-                img.textContent = piece.type.toUpperCase();
-                sq.appendChild(img);
+            if ((r + c) % 2 === 0) {
+                ctx.fillStyle = "#3d3d3d";
+            } else {
+                ctx.fillStyle = "#1e1e1e";
             }
+            ctx.fillRect(c * size, r * size, size, size);
 
-            boardElement.appendChild(sq);
+            const piece = board[r][c];
+            if (piece) {
+                ctx.fillStyle = piece.color === "w" ? "#fff" : "#000";
+                ctx.font = "40px Arial";
+                ctx.fillText(piece.type.toUpperCase(), c * size + 25, r * size + 50);
+            }
         }
     }
 }
 
-// STOCKFISH ENGINE
-let engine = STOCKFISH();
-
-engine.onmessage = function (msg) {
-    if (typeof msg === "string" && msg.includes("bestmove")) {
-        let move = msg.split(" ")[1];
-        chess.move({ from: move.substring(0, 2), to: move.substring(2, 4) });
-        updateBoard();
-        log("Engine plays: " + move);
-    }
-};
-
-function engineMove() {
-    engine.postMessage("ucinewgame");
-    engine.postMessage("position fen " + chess.fen());
-    engine.postMessage("go depth 12");
+// Отправить команду в движок
+function sendToEngine(cmd) {
+    engine.postMessage(cmd);
+    console.log("ENGINE <<", cmd);
 }
 
-// first render
-updateBoard();
+// Передать текущую позицию в движок
+function analyzePosition() {
+    sendToEngine("position fen " + chess.fen());
+    sendToEngine("go depth " + depthSlider.value);
+}
+
+// Обработчик хода игрока
+canvas.addEventListener("click", () => {
+    // Тут позже добавим ввод хода
+    log("Board clicked.");
+});
+
+// Новая игра
+document.getElementById("newGameBtn").onclick = () => {
+    chess.reset();
+    drawBoard();
+    log("New game started.");
+    analyzePosition();
+};
+
+// Играть черными
+document.getElementById("blackBtn").onclick = () => {
+    chess.reset();
+    drawBoard();
+    analyzePosition();
+};
+
+drawBoard();
+log("Ready.");
