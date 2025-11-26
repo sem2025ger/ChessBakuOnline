@@ -8,11 +8,8 @@
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css" />
 
-    <!-- Chess.js (official CDN) -->
+    <!-- Chess.js -->
     <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.min.js"></script>
-
-    <!-- Stockfish Web Worker -->
-    
 </head>
 
 <body>
@@ -25,36 +22,34 @@
             </div>
 
             <div class="header-controls">
-                <button id="newGameBtn" class="btn">New Game</button>
-                <button id="blackBtn" class="btn">Play as Black</button>
+                <button id="newGameBtn" class="btn-primary">New Game</button>
+                <button id="switchSideBtn" class="btn">Play as Black</button>
             </div>
         </header>
 
         <main class="app-main">
             <section class="board-section">
-                <canvas id="boardCanvas" width="600" height="600"></canvas>
+                <div id="board" class="board-frame"></div>
             </section>
 
             <section class="side-panel">
 
-                <div class="eval-box">
+                <div class="panel evaluation">
                     <h3>Evaluation</h3>
-                    <div id="evalBar" class="eval-bar">
-                        <div id="evalFill" class="eval-fill"></div>
-                    </div>
+                    <div id="evalBar" class="eval-bar"></div>
                 </div>
 
-                <div class="engine-controls">
+                <div class="panel engine-settings">
                     <h3>Engine Settings</h3>
                     <label>Depth</label>
-                    <input type="range" id="depthSlider" min="5" max="25" value="12" />
+                    <input id="depthSlider" type="range" min="1" max="20" value="12" />
                     <label>Move Time (ms)</label>
-                    <input type="range" id="timeSlider" min="200" max="2000" value="800" />
+                    <input id="moveTimeSlider" type="range" min="100" max="3000" value="500" />
                 </div>
 
-                <div class="log-box">
+                <div class="panel game-log">
                     <h3>Game Log</h3>
-                    <div id="log"></div>
+                    <div id="log" class="log-box"></div>
                 </div>
 
             </section>
@@ -62,7 +57,10 @@
 
     </div>
 
-    <!-- App logic -->
+    <!-- Stockfish worker -->
+    <script src="stockfish-worker.js"></script>
+
+    <!-- Main game logic -->
     <script src="app.js"></script>
 </body>
 </html>
