@@ -1,109 +1,75 @@
-console.log("ChessBakuOnline loaded.");
+// Global game
+const chess = new Chess();
+let board = null;
 
-const canvas = document.getElementById("boardCanvas");
-const ctx = canvas.getContext("2d");
-
-const logBox = document.getElementById("log");
-const evalFill = document.getElementById("evalFill");
-
-const depthSlider = document.getElementById("depthSlider");
-const timeSlider = document.getElementById("timeSlider");
-
-let chess = new Chess();
-
-// Создаем Web Worker движка
+// Stockfish Worker
 const engine = new Worker("stockfish-worker.js");
 
-function log(text) {
+// UI elements
+const logBox = document.getElementById("log");
+const evalBar = document.getElementById("evalBar");
+const depthSlider = document.getElementById("depthSlider");
+const moveTimeSlider = document.getElementById("moveTimeSlider");
+
+// Log helper
+function addLog(text) {
     logBox.innerHTML += text + "<br>";
     logBox.scrollTop = logBox.scrollHeight;
 }
 
-// Обработка ответов движка
-engine.onmessage = (e) => {
-    const msg = e.data;
+addLog("New game started.");
 
-    if (msg.type === "info") {
-        if (msg.score) {
-            updateEval(msg.score);
+engine.onmessage = function (event) {
+    const msg = event.data;
+
+    if (msg.includes("score cp")) {
+        const match = msg.match(/score cp (-?\d+)/);
+        if (match) {
+            const cp = parseInt(match[1]);
+            const evalValue = Math.max(0, Math.min(100, (cp + 1000) / 20));
+            evalBar.style.width = evalValue + "%";
         }
     }
 
-    if (msg.type === "bestmove") {
-        chess.move(msg.move);
-        drawBoard();
-        log("Engine move: " + msg.move);
+    if (msg.startsWith("bestmove")) {
+        const best = msg.split(" ")[1];
+        if (best && best !== "(none)") {
+            chess.move({ from: best.substring(0, 2), to: best.substring(2, 4) });
+            board.position(chess.fen());
+            addLog("Engine played: " + best);
+        }
     }
 };
 
-function updateEval(score) {
-    let scaled = 50 + score * 4;
-    if (scaled < 0) scaled = 0;
-    if (scaled > 100) scaled = 100;
-
-    evalFill.style.width = scaled + "%";
+function requestEngineMove() {
+    engine.postMessage("ucinewgame");
+    engine.postMessage("position fen " + chess.fen());
+    engine.postMessage("go depth " + depthSlider.value);
 }
 
-// Нарисовать доску (простая визуализация)
-function drawBoard() {
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, 600, 600);
+function onDrop(source, target) {
+    const move = chess.move({ from: source, to: target });
 
-    const board = chess.board();
+    if (move === null) return "snapback";
 
-    const size = 75;
+    addLog("Player moved: " + move.san);
 
-    for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-            if ((r + c) % 2 === 0) {
-                ctx.fillStyle = "#3d3d3d";
-            } else {
-                ctx.fillStyle = "#1e1e1e";
-            }
-            ctx.fillRect(c * size, r * size, size, size);
-
-            const piece = board[r][c];
-            if (piece) {
-                ctx.fillStyle = piece.color === "w" ? "#fff" : "#000";
-                ctx.font = "40px Arial";
-                ctx.fillText(piece.type.toUpperCase(), c * size + 25, r * size + 50);
-            }
-        }
-    }
+    requestEngineMove();
 }
 
-// Отправить команду в движок
-function sendToEngine(cmd) {
-    engine.postMessage(cmd);
-    console.log("ENGINE <<", cmd);
-}
-
-// Передать текущую позицию в движок
-function analyzePosition() {
-    sendToEngine("position fen " + chess.fen());
-    sendToEngine("go depth " + depthSlider.value);
-}
-
-// Обработчик хода игрока
-canvas.addEventListener("click", () => {
-    // Тут позже добавим ввод хода
-    log("Board clicked.");
+board = Chessboard("board", {
+    draggable: true,
+    position: "start",
+    onDrop: onDrop
 });
 
-// Новая игра
 document.getElementById("newGameBtn").onclick = () => {
     chess.reset();
-    drawBoard();
-    log("New game started.");
-    analyzePosition();
+    board.start();
+    addLog("New game started.");
 };
 
-// Играть черными
-document.getElementById("blackBtn").onclick = () => {
-    chess.reset();
-    drawBoard();
-    analyzePosition();
+document.getElementById("switchSideBtn").onclick = () => {
+    board.flip();
+    addLog("Board flipped.");
 };
-
-drawBoard();
-log("Ready.");
