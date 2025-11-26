@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <title>ChessBakuOnline – Premium Black & Gold</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
 
-    <!-- Chess.js – WORKING VERSION -->
-    <script src="https://cdn.jsdelivr.net/npm/chess.js@0.12.0/chess.min.js"></script>
+    <!-- Chess.js (official CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/chess.min.js"></script>
 
-    <!-- Stockfish WebAssembly -->
-    <script src="stockfish.js"></script>
+    <!-- Stockfish Web Worker -->
+    <script src="stockfish-worker.js"></script>
 </head>
 
 <body>
@@ -24,48 +24,45 @@
                 <span class="logo-sub">Premium Arena</span>
             </div>
 
-            <div class="header_controls">
-                <button id="newGameBtn" class="btn_primary">New Game</button>
-                <button id="switchSideBtn" class="btn_primary">Play as Black</button>
+            <div class="header-controls">
+                <button id="newGameBtn" class="btn">New Game</button>
+                <button id="blackBtn" class="btn">Play as Black</button>
             </div>
         </header>
 
         <main class="app-main">
             <section class="board-section">
-                <div id="board" class="board-frame"></div>
+                <canvas id="boardCanvas" width="600" height="600"></canvas>
             </section>
 
-            <section class="sidepanel">
-                <div class="panel-block">
+            <section class="side-panel">
+
+                <div class="eval-box">
                     <h3>Evaluation</h3>
-                    <div id="evalBar" class="eval-bar"></div>
+                    <div id="evalBar" class="eval-bar">
+                        <div id="evalFill" class="eval-fill"></div>
+                    </div>
                 </div>
 
-                <div class="panel-block">
+                <div class="engine-controls">
                     <h3>Engine Settings</h3>
                     <label>Depth</label>
-                    <input type="range" min="1" max="22" value="12" id="depthSlider">
-
+                    <input type="range" id="depthSlider" min="5" max="25" value="12" />
                     <label>Move Time (ms)</label>
-                    <input type="range" min="200" max="3000" value="800" id="timeSlider">
+                    <input type="range" id="timeSlider" min="200" max="2000" value="800" />
                 </div>
 
-                <div class="panel-block">
+                <div class="log-box">
                     <h3>Game Log</h3>
-                    <div id="gameLog" class="game-log"></div>
+                    <div id="log"></div>
                 </div>
+
             </section>
         </main>
 
-        <footer class="footer">
-            <div>Status: <span id="statusText">Waiting…</span></div>
-            <div>Turn: <span id="turnText">White</span></div>
-            <div>Engine: <span id="engineText">Ready</span></div>
-            <div class="footer-copy">© 2025 ChessBakuOnline – Black & Gold Edition</div>
-        </footer>
-
     </div>
 
+    <!-- App logic -->
     <script src="app.js"></script>
 </body>
 </html>
